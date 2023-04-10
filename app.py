@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image, ImageOps
 import os
+import SSD
 
 option=''
 
@@ -21,7 +22,7 @@ with st.sidebar:
         plt.imread(uploaded_file)
         image_path1=os.path.join(path,uploaded_file.name)
         st.title("Options")
-        option = st.selectbox("",["normalized cross correlations"])
+        option = st.selectbox("",["normalized cross correlations","Sum of Square Difference"])
         if option == 'normalized cross correlations':
             st.title("Upload template")
             second_image=st.file_uploader("", accept_multiple_files=False, type=['jpg','png','jpeg'])
@@ -29,7 +30,15 @@ with st.sidebar:
                 image2 = Image.open(second_image)
                 plt.imread(second_image)
                 image_path2=os.path.join(path,second_image.name)
-
+                
+        if option == 'Sum of Square Difference' :
+            st.title("Upload template")
+            second_image=st.file_uploader("", accept_multiple_files=False, type=['jpg','png','jpeg'])
+            if second_image is not None:
+                image2 = Image.open(second_image)
+                plt.imread(second_image)
+                image_path2=os.path.join(path,second_image.name)
+    
 input_img, resulted_img = st.columns(2)
 with input_img:
     if uploaded_file is not None:
@@ -69,3 +78,10 @@ with resulted_img:
                     plt.savefig("./images/output/ncc.jpeg")
                
                     st.image('./images/output/ncc.jpeg')
+                    
+    if option == 'Sum of Square Difference' :
+        if uploaded_file is not None:
+            if second_image is not None: 
+                st.title("Matched image")
+                SSD.sum_of_square_differance(uploaded_file, second_image)
+                st.image('./images/output/ssd.jpeg')
