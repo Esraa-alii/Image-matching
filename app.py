@@ -6,6 +6,7 @@ import numpy as np
 from PIL import Image, ImageOps
 import os
 import SSD
+import Harris_operator as HO
 
 option=''
 
@@ -22,7 +23,7 @@ with st.sidebar:
         plt.imread(uploaded_file)
         image_path1=os.path.join(path,uploaded_file.name)
         st.title("Options")
-        option = st.selectbox("",["normalized cross correlations","Sum of Square Difference"])
+        option = st.selectbox("",["normalized cross correlations","Sum of Square Difference", "Harris Operator"])
         if option == 'normalized cross correlations':
             st.title("Upload template")
             second_image=st.file_uploader("", accept_multiple_files=False, type=['jpg','png','jpeg'])
@@ -38,6 +39,8 @@ with st.sidebar:
                 image2 = Image.open(second_image)
                 plt.imread(second_image)
                 image_path2=os.path.join(path,second_image.name)
+        if option == 'Harris Operator':
+            threshold = st.slider(label="Threshold", min_value=0.0, max_value=1.0, step=0.01, value=0.1)
     
 input_img, resulted_img = st.columns(2)
 with input_img:
@@ -45,9 +48,10 @@ with input_img:
             st.title("Input images")
             image = Image.open(uploaded_file)
             st.image(uploaded_file)
-            if second_image is not None: 
-                image2 = Image.open(second_image)
-                st.image(second_image)
+            if (option == 'normalized cross correlations') or (option == 'Sum of Square Difference'):
+                if second_image is not None: 
+                    image2 = Image.open(second_image)
+                    st.image(second_image)
 
 
 with resulted_img:
@@ -85,3 +89,9 @@ with resulted_img:
                 st.title("Matched image")
                 SSD.sum_of_square_differance(uploaded_file, second_image)
                 st.image('./images/output/ssd.jpeg')
+    if option == 'Harris Operator':
+        if uploaded_file is not None:
+            st.title("Output Image")
+            harris_path, final_time = HO.harris(uploaded_file, threshold)
+            st.image(harris_path)
+            st.write(final_time)
