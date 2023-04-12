@@ -7,6 +7,7 @@ from PIL import Image, ImageOps
 import os
 import SSD
 import Harris_operator as HO
+import run_pysift
 
 option=''
 
@@ -18,12 +19,13 @@ with open('style.css') as f:
 with st.sidebar:
     st.title('Upload an image')
     uploaded_file = st.file_uploader("", accept_multiple_files=False, type=['jpg','png','jpeg','webp'])
+    
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
         plt.imread(uploaded_file)
         image_path1=os.path.join(path,uploaded_file.name)
         st.title("Options")
-        option = st.selectbox("",["normalized cross correlations","Sum of Square Difference", "Harris Operator"])
+        option = st.selectbox("",["normalized cross correlations","Sum of Square Difference", "Harris Operator","Apply SIFT"])
         if option == 'normalized cross correlations':
             st.title("Upload template")
             second_image=st.file_uploader("", accept_multiple_files=False, type=['jpg','png','jpeg'])
@@ -39,8 +41,17 @@ with st.sidebar:
                 image2 = Image.open(second_image)
                 plt.imread(second_image)
                 image_path2=os.path.join(path,second_image.name)
+        
         if option == 'Harris Operator':
             threshold = st.slider(label="Threshold", min_value=0.0, max_value=1.0, step=0.01, value=0.1)
+
+        if option == 'Apply SIFT':
+            st.title("Upload template")
+            second_image=st.file_uploader("", accept_multiple_files=False, type=['jpg','png','jpeg'])
+            if second_image is not None:
+                image2 = Image.open(second_image)
+                plt.imread(second_image)
+                image_path2=os.path.join(path,second_image.name)
     
 input_img, resulted_img = st.columns(2)
 with input_img:
@@ -48,10 +59,11 @@ with input_img:
             st.title("Input images")
             image = Image.open(uploaded_file)
             st.image(uploaded_file)
-            if (option == 'normalized cross correlations') or (option == 'Sum of Square Difference'):
+            if (option == 'normalized cross correlations') or (option == 'Sum of Square Difference') or (option == 'Apply SIFT'):
                 if second_image is not None: 
                     image2 = Image.open(second_image)
                     st.image(second_image)
+           
 
 
 with resulted_img:
@@ -95,3 +107,10 @@ with resulted_img:
             harris_path, final_time = HO.harris(uploaded_file, threshold)
             st.image(harris_path)
             st.write(final_time)
+
+    if option == 'Apply SIFT' :
+        if uploaded_file is not None:
+            if second_image is not None: 
+                st.title("SIFT image")
+                run_pysift.pysift_image()
+                st.image('./images/output/sift.jpeg')
