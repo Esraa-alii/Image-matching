@@ -61,4 +61,5 @@ def sum_of_square_differance(frist_img,secound_img) :
     
    
     plt.imshow(I_)
+    plt.axis("off")
     plt.savefig('images/output/ssd.jpeg')
